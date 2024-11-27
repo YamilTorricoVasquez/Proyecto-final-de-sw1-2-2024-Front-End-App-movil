@@ -1,4 +1,6 @@
-0 Background Noise
-1 Bell
-2 Whistle
-3 Xylophone
+0 Dolor de Vientre
+1 Eructar
+2 Fatigado
+3 Hambriento
+4 Malestar
+5 Ruido de fondo

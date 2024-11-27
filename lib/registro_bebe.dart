@@ -1,10 +1,13 @@
 import 'package:app/api/ApiConst.dart';
 import 'package:app/function/function.dart';
 import 'package:app/function/varGlobales.dart';
+import 'package:app/function/widget.dart';
+
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class RegistroBebe extends StatefulWidget {
   const RegistroBebe({super.key});
@@ -17,7 +20,7 @@ class _RegistroBebeState extends State<RegistroBebe> {
   Future<void> registrarBebe(String nombre, String fecha_nacimiento,
       String genero, String ci_usuario) async {
     final url = Uri.parse(
-        '${Api.api}:${Api.port.toString()}/api/v1/bebe/registrar'); // Cambia la URL a la de tu API
+        '${Api.url}/api/v1/bebe/registrar'); // Cambia la URL a la de tu API
     final headers = {'Content-Type': 'application/json'};
 
     final body = json.encode({
@@ -82,43 +85,53 @@ class _RegistroBebeState extends State<RegistroBebe> {
     }
   }
 
-  Widget _widget = const Text("Registrar",
+  DateTime parseFecha(String fechaString) {
+    // Define el formato de la fecha
+    final DateFormat formato = DateFormat('dd/MM/yyyy');
+
+    // Convierte el String a DateTime
+    return formato.parse(fechaString);
+  }
+
+  Widget _widget = Text("Registrar",
       style: TextStyle(
           fontWeight: FontWeight.bold, fontSize: 25, color: Colors.black));
 
   final _formKey = GlobalKey<FormState>();
-  String? _selectedGenero; // Para almacenar la opción seleccionada
+  // String? _selectedGenero; // Para almacenar la opción seleccionada
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _fechaController = TextEditingController();
   final TextEditingController _generoController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
+    return Container(
+     /* decoration: fondoApp,
+      height: double.infinity,
+      width: double.infinity,*/
+      child: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              const Padding(
+            /*  Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
                   "Registrar bebe",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.pink),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                    color: Colors.pink[200],
+                  ),
                 ),
-              ),
+              ),*/
+              SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
+                    // border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: const [
-                      BoxShadow(
-                          blurRadius: 5, spreadRadius: 0.5, color: Colors.black)
-                    ],
+                    boxShadow: [boxShadow],
                     color: Colors.white,
                   ),
                   child: Column(
@@ -150,51 +163,58 @@ class _RegistroBebeState extends State<RegistroBebe> {
                 padding: const EdgeInsets.all(20),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
+                    //  border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: const [
-                      BoxShadow(
-                          blurRadius: 5, spreadRadius: 0.5, color: Colors.black)
-                    ],
+                    boxShadow: [boxShadow],
                     color: Colors.white,
                   ),
                   child: Column(
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
-                        child: InkWell(
-                          onTap: () =>
-                              _selectDate(context), // Abre el DatePicker
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              labelText: "Fecha de nacimiento",
-                              labelStyle: TextStyle(color: Colors.pink[200]),
-                              border: InputBorder.none,
-                            ),
-                            child: Text(
-                              _fechaController.text.isEmpty
-                                  ? 'Seleccione una fecha'
-                                  : _fechaController.text,
-                            ),
-                          ),
+                        child: FormField<String>(
+                          validator: (value) {
+                            if (_fechaController.text.isEmpty) {
+                              return 'Seleccione una fecha de nacimiento';
+                            }
+                            return null;
+                          },
+                          builder: (FormFieldState<String> state) {
+                            return InkWell(
+                              onTap: () =>
+                                  _selectDate(context), // Abre el DatePicker
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  labelText: "Fecha de nacimiento",
+                                  labelStyle:
+                                      TextStyle(color: Colors.pink[200]),
+                                  border: InputBorder.none,
+                                  errorText: state
+                                      .errorText, // Mostrar mensaje de error si es necesario
+                                ),
+                                child: Text(
+                                  _fechaController.text.isEmpty
+                                      ? 'Seleccione una fecha'
+                                      : _fechaController.text,
+                                  style: const TextStyle(fontSize: 15.5),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
+                    // border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: const [
-                      BoxShadow(
-                          blurRadius: 5,
-                          spreadRadius: 0.5,
-                          color: Colors.black),
-                    ],
+                    boxShadow: [boxShadow],
                     color: Colors.white,
                   ),
                   child: Column(
@@ -205,8 +225,11 @@ class _RegistroBebeState extends State<RegistroBebe> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             labelText: "Género",
-                            labelStyle: TextStyle(color: Colors.pink[200]),
+                            labelStyle: TextStyle(
+                              color: Colors.pink[200],
+                            ),
                           ),
+
                           value: _generoController.text.isNotEmpty
                               ? _generoController.text
                               : null, // Usar el valor del controller
@@ -214,7 +237,13 @@ class _RegistroBebeState extends State<RegistroBebe> {
                               .map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
-                              child: Text(value),
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  fontWeight: FontWeight
+                                      .normal, // Asegura que no sea negrita
+                                ),
+                              ),
                             );
                           }).toList(),
                           onChanged: (newValue) {
@@ -240,15 +269,10 @@ class _RegistroBebeState extends State<RegistroBebe> {
                   width: 318,
                   height: 50,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green.shade200),
+                    // border: Border.all(color: Colors.pink.shade200),
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.green[200],
-                    boxShadow: const [
-                      BoxShadow(
-                          blurRadius: 5,
-                          spreadRadius: 0.5,
-                          color: Colors.black),
-                    ],
+                    boxShadow: [boxShadow],
                   ),
                   child: Center(
                     child: _widget,

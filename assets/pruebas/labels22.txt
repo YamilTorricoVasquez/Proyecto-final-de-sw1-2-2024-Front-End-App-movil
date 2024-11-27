@@ -1,0 +1,2 @@
+0 Ruido de fondo
+1 belly_pain
